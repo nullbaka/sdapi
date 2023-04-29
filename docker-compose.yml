@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+
+  web:
+    hostname: web
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload 
+    ports:
+      - 8000:8000
+    volumes:
+      - project_volume:/app
+    env_file: .env
+    restart: always
+    privileged: true
+    stdin_open: true
+    tty: true
+    depends_on:
+      - redis
+
+  worker:
+    hostname: worker
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: celery -A tasks.celery worker --loglevel=info
+    volumes:
+      - project_volume:/app
+    env_file: .env
+    privileged: true
+    stdin_open: true
+    tty: true
+    depends_on:
+      - web
+      - redis
+
+  redis:
+    hostname: redis
+    image: redis:7
+
+volumes:
+  project_volume:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /Users/uttaranwary/puntime/sdapi

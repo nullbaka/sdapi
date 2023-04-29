@@ -1,0 +1,6 @@
+dump.rdb
+.env
+/__pycache__/
+bark/__pycache__
+bark/bark/__pycache__
+.DS_Store
