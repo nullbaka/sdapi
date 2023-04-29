@@ -4,11 +4,13 @@ from scipy.io.wavfile import write as write_wav
 
 from bark.bark import preload_models, generate_audio, SAMPLE_RATE
 
-from json_manager import add_to_running_tasks, remove_from_running_tasks
+from settings import CELERY_BROKER_URL, CELERY_RESULT_BACKEND
+from json_manager import (
+    add_to_running_tasks,
+    remove_from_running_tasks,
+    update_app_state
+)
 
-
-CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', "redis://127.0.0.1:6379/0")
-CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', "redis://127.0.0.1:6379/0")
 
 celery = Celery(
     __name__,
@@ -22,10 +24,11 @@ def preloader(self):
     task_id = self.request.id
 
     add_to_running_tasks(self.name, task_id)
-
     preload_models()
-
     remove_from_running_tasks(self.name)
+
+    update_app_state("are_models_loaded", True)
+
 
 @celery.task(bind=True, name="audio_generator")
 def audio_generator(self, prompt, path):

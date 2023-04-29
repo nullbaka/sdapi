@@ -5,8 +5,8 @@ from fastapi.responses import FileResponse
 
 from models import Prompt
 from tasks import preloader, audio_generator
-from json_manager import read_json
-from constants import RUNNING_TASKS_FILE_PATH, AUDIO_DIRECTORY
+from json_manager import read_json, are_models_preloaded
+from settings import RUNNING_TASKS_FILE_PATH, AUDIO_DIRECTORY
 
 
 app = FastAPI()
@@ -20,7 +20,7 @@ def index():
     }
 
 
-@app.get("/preload-models")
+@app.post("/preload-models")
 def preload_models():
     task_name = preloader.name
 
@@ -40,8 +40,14 @@ def preload_models():
 
 @app.post("/generate-audio")
 def generate_audio(prompt: Prompt):
-    task_name = audio_generator.name
 
+    if not are_models_preloaded():
+        return {
+            "success": False,
+            "message": "Models have not been preloaded yet."
+        }
+
+    task_name = audio_generator.name
     running_tasks = read_json(RUNNING_TASKS_FILE_PATH)
     if task_name in running_tasks:
         return {
@@ -49,14 +55,12 @@ def generate_audio(prompt: Prompt):
             "message": "Generating an audio. Please try again later."
         }
 
-    prompt_text = prompt.text
-
     time_now_obj = time.time()
     time_now_str = str(time_now_obj).split('.')[0]
-
     filename = f"audio_{time_now_str}.wav"
-
     path = f"{AUDIO_DIRECTORY}/{filename}"
+
+    prompt_text = prompt.text
     audio_generator.delay(prompt_text, path)
 
     return {

@@ -1,7 +1,7 @@
 import os
 import json
 
-from constants import RUNNING_TASKS_FILE_PATH
+from settings import RUNNING_TASKS_FILE_PATH, APP_STATE_FILE_PATH
 
 
 def write_json(file_path, json_obj):
@@ -34,3 +34,14 @@ def remove_from_running_tasks(task_name):
     running_tasks = read_json(RUNNING_TASKS_FILE_PATH)
     running_tasks.pop(task_name)
     write_json(RUNNING_TASKS_FILE_PATH, running_tasks)
+
+
+def update_app_state(key_name, value):
+    app_state = read_json(APP_STATE_FILE_PATH)
+    app_state[key_name] = value
+    write_json(APP_STATE_FILE_PATH, app_state)
+
+
+def are_models_preloaded():
+    app_state = read_json(APP_STATE_FILE_PATH)
+    return app_state.get('are_models_loaded', False)
