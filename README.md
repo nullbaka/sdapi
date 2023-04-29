@@ -16,10 +16,10 @@
 
 
 ### Endpoints
-- **GET** [localhost:8000/](localhost:8000/)
-- **POST** [localhost:8000/preload-models](localhost:8000/preload-models)
-- **POST** [localhost:8000/generate-audio](localhost:8000/generate-audio)
-- **GET** [localhost:8000/download-audio](localhost:8000/download-audio)
+- [**GET** localhost:8000/](localhost:8000/)
+- [**POST** localhost:8000/preload-models](localhost:8000/preload-models)
+- [**POST** localhost:8000/generate-audio](localhost:8000/generate-audio)
+- [**GET** localhost:8000/download-audio](localhost:8000/download-audio)
 
 
 ### Screen Recordings
